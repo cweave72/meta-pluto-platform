@@ -5,9 +5,11 @@ DISTRO ?= "pluto"
 
 # Build caches. init_build.sh replaces these three lines.
 # DL_DIR and SSTATE_DIR can be on a network share. TMPDIR must be on a local disk.
-DL_DIR ?= "${TOPDIR}/downloads"
-SSTATE_DIR ?= "${TOPDIR}/sstate-cache"
-TMPDIR ?= "${TOPDIR}/tmp"
+# Use "=", not "?=". bitbake.conf sets TMPDIR with "?=" before it reads
+# local.conf, so "?=" here has no effect.
+DL_DIR = "${TOPDIR}/downloads"
+SSTATE_DIR = "${TOPDIR}/sstate-cache"
+TMPDIR = "${TOPDIR}/tmp"
 
 # Hash equivalence database. One local directory for all build directories on
 # this host. Do not put it on a network share (SQLite locks).
