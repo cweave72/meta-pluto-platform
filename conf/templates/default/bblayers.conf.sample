@@ -1,0 +1,13 @@
+# LAYER_CONF_VERSION changes when build/conf/bblayers.conf changes incompatibly.
+LCONF_VERSION = "7"
+
+BBPATH = "${TOPDIR}"
+BBFILES ?= ""
+
+# oe-init-build-env replaces ##OEROOT## with the openembedded-core path.
+BBLAYERS ?= " \
+  ##OEROOT##/meta \
+  ##OEROOT##/../meta-yocto/meta-poky \
+  ##OEROOT##/../meta-openembedded/meta-oe \
+  ##OEROOT##/../meta-pluto-platform \
+  "

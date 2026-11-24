@@ -1,0 +1,46 @@
+# Local build host settings. Do not put hardware or policy settings here.
+
+MACHINE ??= "pluto"
+DISTRO ?= "pluto"
+
+# Build caches. init_build.sh replaces these three lines.
+# DL_DIR and SSTATE_DIR can be on a network share. TMPDIR must be on a local disk.
+DL_DIR ?= "${TOPDIR}/downloads"
+SSTATE_DIR ?= "${TOPDIR}/sstate-cache"
+TMPDIR ?= "${TOPDIR}/tmp"
+
+# Hash equivalence database. One local directory for all build directories on
+# this host. Do not put it on a network share (SQLite locks).
+BB_HASHSERVE_DB_DIR ?= "${HOME}/yocto/hashserv"
+
+# Remove each work directory after a successful build. TMPDIR stays small.
+INHERIT += "rm_work"
+# Keep the work directory of a recipe that you debug:
+#RM_WORK_EXCLUDE += "linux-pluto"
+
+# Write each git mirror in DL_DIR as one tarball. Faster on a network share.
+BB_GENERATE_MIRROR_TARBALLS = "1"
+
+# Platform default bitstream (.bit) for the FIT image. pluto-fit needs it.
+# Example: PLUTO_BITSTREAM = "/home/<user>/pluto/system_top.bit"
+PLUTO_BITSTREAM ?= ""
+
+# Development only: root login on the serial console without a password.
+# Remove these features for a release image.
+EXTRA_IMAGE_FEATURES ?= "allow-empty-password empty-root-password allow-root-login"
+
+USER_CLASSES ?= "buildstats"
+PATCHRESOLVE = "noop"
+
+BB_DISKMON_DIRS ??= "\
+    STOPTASKS,${TMPDIR},1G,100K \
+    STOPTASKS,${DL_DIR},1G,100K \
+    STOPTASKS,${SSTATE_DIR},1G,100K \
+    STOPTASKS,/tmp,100M,100K \
+    HALT,${TMPDIR},100M,1K \
+    HALT,${DL_DIR},100M,1K \
+    HALT,${SSTATE_DIR},100M,1K \
+    HALT,/tmp,10M,1K"
+
+# CONF_VERSION changes when build/conf/local.conf changes incompatibly.
+CONF_VERSION = "2"
