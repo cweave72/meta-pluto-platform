@@ -21,13 +21,17 @@ BB_HASHSERVE_DB_DIR ?= "${HOME}/yocto/hashserv"
 
 # Remove each work directory after a successful build. TMPDIR stays small.
 INHERIT += "rm_work"
+# Keep the image work directory. The assembled root file system stays in
+# ${TMPDIR}/work/${MACHINE}-poky-linux-gnueabi/<image>/1.0/rootfs/.
+RM_WORK_EXCLUDE += "core-image-minimal"
 # Keep the work directory of a recipe that you debug:
 #RM_WORK_EXCLUDE += "linux-pluto"
 
 # Write each git mirror in DL_DIR as one tarball. Faster on a network share.
 BB_GENERATE_MIRROR_TARBALLS = "1"
 
-# Platform default bitstream (.bit) for the FIT image. pluto-fit needs it.
+# Platform default bitstream (.bit) for the FIT image.
+# Empty: pluto-fit uses the ADI stock system_top.bit (pluto-jtag-bootstrap).
 # Example: PLUTO_BITSTREAM = "/home/<user>/pluto/system_top.bit"
 PLUTO_BITSTREAM ?= ""
 

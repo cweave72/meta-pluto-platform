@@ -1,7 +1,7 @@
 
 Targets:
     core-image-minimal    initramfs (cpio.gz)
-    pluto-fit             pluto.itb, pluto.frm, pluto.dfu (needs PLUTO_BITSTREAM)
+    pluto-fit             pluto.itb, pluto.frm, pluto.dfu
 
 Output: deploy/images/pluto/ (in the build directory)
 
