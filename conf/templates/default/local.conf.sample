@@ -11,6 +11,10 @@ DL_DIR = "${TOPDIR}/downloads"
 SSTATE_DIR = "${TOPDIR}/sstate-cache"
 TMPDIR = "${TOPDIR}/tmp"
 
+# Build output: images, packages, and license data. Keep it in the build
+# directory. TMPDIR keeps only the work directories and sysroots.
+DEPLOY_DIR = "${TOPDIR}/deploy"
+
 # Hash equivalence database. One local directory for all build directories on
 # this host. Do not put it on a network share (SQLite locks).
 BB_HASHSERVE_DB_DIR ?= "${HOME}/yocto/hashserv"
@@ -30,6 +34,20 @@ PLUTO_BITSTREAM ?= ""
 # Development only: root login on the serial console without a password.
 # Remove these features for a release image.
 EXTRA_IMAGE_FEATURES ?= "allow-empty-password empty-root-password allow-root-login"
+
+# Build host load limits. Set for a 12-CPU, 12 GB host. BitBake defaults
+# to one task per CPU and "make -j <CPUs>" in each task. On a host with less
+# than about 2 GB RAM per CPU, the defaults fill the RAM and the host swaps.
+# Maximum compile jobs = BB_NUMBER_THREADS x the PARALLEL_MAKE -j value.
+BB_NUMBER_THREADS = "4"
+# -l 12: make starts no new job while the load average is above 12.
+PARALLEL_MAKE = "-j 4 -l 12"
+# Lowest CPU priority and lowest best-effort disk priority for build tasks.
+BB_TASK_NICE_LEVEL = "19"
+BB_TASK_IONICE_LEVEL = "2.7"
+# Start no new task while processes stall on memory more than 2% of the time
+# (/proc/pressure/memory, microseconds per second).
+BB_PRESSURE_MAX_MEMORY = "20000"
 
 USER_CLASSES ?= "buildstats"
 PATCHRESOLVE = "noop"
