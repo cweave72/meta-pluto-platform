@@ -1,0 +1,70 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          pluto-usb-gadget
+# Required-Start:    $local_fs
+# Required-Stop:
+# Default-Start:     S
+# Default-Stop:      0 6
+# Short-Description: USB network gadget on the USB OTG port
+### END INIT INFO
+#
+# Configure the USB OTG port as a USB network device with configfs.
+# The networking script then gives usb0 its address (/etc/network/interfaces).
+# Settings: /etc/default/pluto-usb-gadget.
+
+USB_VID="0x1d6b"
+USB_PID="0x0104"
+USB_FUNCTION="ecm"
+USB_MANUFACTURER="Pluto platform"
+USB_PRODUCT="Pluto"
+USB_SERIAL="0"
+USB_DEV_ADDR="02:50:4c:00:00:01"
+USB_HOST_ADDR="02:50:4c:00:00:02"
+[ -r /etc/default/pluto-usb-gadget ] && . /etc/default/pluto-usb-gadget
+
+CONFIGFS=/sys/kernel/config
+G=$CONFIGFS/usb_gadget/pluto
+F=$G/functions/$USB_FUNCTION.usb0
+C=$G/configs/c.1
+
+start() {
+    grep -q " $CONFIGFS configfs " /proc/mounts || mount -t configfs configfs $CONFIGFS
+    if [ -d $G ]; then
+        echo "pluto-usb-gadget: gadget is already configured"
+        return 0
+    fi
+    udc=$(ls /sys/class/udc 2>/dev/null | head -n 1)
+    if [ -z "$udc" ]; then
+        echo "pluto-usb-gadget: no USB device controller"
+        return 1
+    fi
+
+    mkdir -p $G/strings/0x409 $C/strings/0x409 $F
+    echo "$USB_VID" > $G/idVendor
+    echo "$USB_PID" > $G/idProduct
+    echo 0x0200 > $G/bcdUSB
+    echo "$USB_MANUFACTURER" > $G/strings/0x409/manufacturer
+    echo "$USB_PRODUCT" > $G/strings/0x409/product
+    echo "$USB_SERIAL" > $G/strings/0x409/serialnumber
+    echo "$USB_FUNCTION network" > $C/strings/0x409/configuration
+    echo 250 > $C/MaxPower
+    echo "$USB_DEV_ADDR" > $F/dev_addr
+    echo "$USB_HOST_ADDR" > $F/host_addr
+    ln -s $F $C/
+    echo "$udc" > $G/UDC
+    echo "pluto-usb-gadget: $USB_FUNCTION on $udc, interface $(cat $F/ifname)"
+}
+
+stop() {
+    [ -d $G ] || return 0
+    echo "" > $G/UDC 2>/dev/null
+    rm -f $C/$USB_FUNCTION.usb0
+    rmdir $C/strings/0x409 $C $F $G/strings/0x409 $G
+}
+
+case "$1" in
+    start)   start ;;
+    stop)    stop ;;
+    restart) stop; start ;;
+    *)       echo "Usage: $0 {start|stop|restart}"; exit 1 ;;
+esac

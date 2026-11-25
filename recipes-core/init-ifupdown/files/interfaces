@@ -1,0 +1,11 @@
+# /etc/network/interfaces for the Pluto platform.
+# The networking init script runs "ifup -a" for the "auto" interfaces.
+
+auto lo
+iface lo inet loopback
+
+# USB network gadget (pluto-usb-gadget). The host gets 192.168.2.10 by DHCP.
+auto usb0
+iface usb0 inet static
+	address 192.168.2.1
+	netmask 255.255.255.0

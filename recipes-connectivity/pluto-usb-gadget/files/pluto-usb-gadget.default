@@ -1,0 +1,17 @@
+# Settings for /etc/init.d/pluto-usb-gadget.
+
+# USB IDs. 1d6b:0104 is the Linux Foundation multifunction composite gadget.
+USB_VID="0x1d6b"
+USB_PID="0x0104"
+
+# Network function: "ecm" (Linux, macOS) or "ncm" (Linux, macOS, Windows 10+).
+USB_FUNCTION="ecm"
+
+USB_MANUFACTURER="Pluto platform"
+USB_PRODUCT="Pluto"
+USB_SERIAL="0"
+
+# Fixed, locally administered MAC addresses. The host keeps the same
+# interface name and network configuration after each boot.
+USB_DEV_ADDR="02:50:4c:00:00:01"
+USB_HOST_ADDR="02:50:4c:00:00:02"
